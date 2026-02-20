@@ -47,11 +47,22 @@ class TextbookProcessor:
 9. VOCABULARY/DEFINITIONS: Format as **Term**: Definition
 10. MAINTAIN reading order and logical flow of educational content"""
 
+    SAFE_TEXTBOOK_PROMPT = """Extract the text from this textbook page exactly as written. Do not hallucinate or add content that is not visible in the image.
+
+Guidelines:
+- TABLES: If you can read the table cells, output them in HTML <table> format. If cells are unreadable, use empty cells rather than guessing content.
+- HEADINGS: Use markdown heading levels (# ## ###) based on visual hierarchy
+- LISTS: Preserve bullet and numbered lists exactly as formatted
+- IMAGES: Briefly describe what is shown in <img>brief description</img> tags. Do not invent details.
+- PAGE NUMBERS: Wrap in <page_number>N</page_number>
+- Only output text that is actually visible and readable in the document."""
+
     def __init__(
         self,
         dpi: int = 200,
         max_tokens: int = 8192,
         use_textbook_prompt: bool = True,
+        use_safe_prompt: bool = False,
         preserve_hierarchy: bool = True,
         output_format: str = "markdown",
         chunk_pages: int = 50,
@@ -59,6 +70,7 @@ class TextbookProcessor:
         self.dpi = dpi
         self.max_tokens = max_tokens
         self.use_textbook_prompt = use_textbook_prompt
+        self.use_safe_prompt = use_safe_prompt
         self.preserve_hierarchy = preserve_hierarchy
         self.output_format = output_format
         self.chunk_pages = chunk_pages
@@ -129,11 +141,12 @@ class TextbookProcessor:
                 np_module.NanonetsDocumentProcessor._extract_text_with_nanonets
             )
             processor_self = self
-            prompt_to_use = (
-                self.TEXTBOOK_PROMPT
-                if self.use_textbook_prompt
-                else self.DEFAULT_PROMPT
-            )
+            if self.use_safe_prompt:
+                prompt_to_use = self.SAFE_TEXTBOOK_PROMPT
+            elif self.use_textbook_prompt:
+                prompt_to_use = self.TEXTBOOK_PROMPT
+            else:
+                prompt_to_use = self.DEFAULT_PROMPT
             max_tokens = self.max_tokens
 
             def _enhanced_extract(self, image_path, max_new_tokens=None):
@@ -201,9 +214,12 @@ class TextbookProcessor:
                 _enhanced_extract
             )
             optimizations.append(f"tokens={max_tokens}")
-            optimizations.append(
-                "textbook_prompt" if self.use_textbook_prompt else "default_prompt"
-            )
+            if self.use_safe_prompt:
+                optimizations.append("safe_prompt")
+            elif self.use_textbook_prompt:
+                optimizations.append("textbook_prompt")
+            else:
+                optimizations.append("default_prompt")
         except (ImportError, AttributeError) as e:
             print(f"[textbook] Enhanced extract patch failed: {e}")
 
@@ -537,6 +553,11 @@ def main():
         "--no-hierarchy", action="store_true", help="Disable heading normalization"
     )
     parser.add_argument(
+        "--safe",
+        action="store_true",
+        help="Use safe prompt with anti-hallucination guardrails (recommended for tables)",
+    )
+    parser.add_argument(
         "--chunk-pages",
         type=int,
         default=50,
@@ -548,7 +569,8 @@ def main():
     processor = TextbookProcessor(
         dpi=args.dpi,
         max_tokens=args.tokens,
-        use_textbook_prompt=True,
+        use_textbook_prompt=not args.safe,
+        use_safe_prompt=args.safe,
         preserve_hierarchy=not args.no_hierarchy,
         output_format=args.format,
         chunk_pages=args.chunk_pages,
