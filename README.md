@@ -127,19 +127,69 @@ Features:
 - Outputs page number annotations
 - Optimized for vector DB ingestion
 
-## Sample Benchmark Results
+## Benchmark Results
 
-On a 19-page medical document (Bates' Guide - Anus, Rectum, Prostate):
+Tested on a 19-page medical textbook sample (Bates' Guide to Physical Examination, Chapters 15-16) containing tables, clinical images, multi-column layouts, bullet lists, and dense medical terminology. GPU: RTX 4000 Ada 20GB.
 
-| Tool | Time | Chars | Words | Headings | Tables | Lists |
-|------|------|-------|-------|----------|--------|-------|
-| marker-pdf | 23s | 31,770 | 4,111 | 53 | 7 | 94 |
-| nougat | 224s | 21,194 | 3,082 | 41 | 0 | 131 |
-| deepseek-ocr | 526s | 29,424 | 4,050 | 62 | 0 | 1 |
-| paddleocr | 180s | 28,026 | 3,943 | 19 | 0 | 0 |
-| docstrange | 775s | 53,357 | 8,144 | 34 | 0 | 84 |
+### Performance
 
-**Recommendation**: marker-pdf for best speed/structure balance, docstrange for maximum content extraction.
+| Tool | Time | Chars | Words | Images | Tables | Lists | Bold |
+|------|------|-------|-------|--------|--------|-------|------|
+| marker-pdf | **23s** | 31,770 | 4,111 | 25 | 7 | 94 | 80 |
+| docstrange | 775s | 53,357 | 8,144 | 33 | 0* | 84 | 72 |
+| deepseek-ocr | 526s | 29,424 | 4,050 | 24 | 0* | 1 | 0 |
+| nougat | 224s | 21,194 | 3,082 | 0 | 0 | 131 | 13 |
+| paddleocr | 180s | 28,026 | 3,943 | 0 | 0 | 0 | 0 |
+
+*DeepSeek and DocStrange output HTML `<table>` elements (not markdown pipe tables), so the structure counter reports 0.
+
+### Quality Comparison (Top 3)
+
+#### 1st: DocStrange
+
+Best overall output for medical education content.
+
+- **Tables**: Semantic HTML with `<thead>`, `<tbody>`, `colspan`, `<strong>` inside cells. The BPH scoring questionnaire and Systemic Disorders tables are perfectly structured.
+- **Images**: Extracts native embedded images from PDF at original resolution. AI-generated alt-text descriptions (e.g., `![A diagram showing an anal fissure...](images/page3_img1.jpeg)`) provide context that's genuinely useful for accessibility and study.
+- **Lists**: 84 properly formatted bullet items with correct nesting (sublists for ligaments, tendons under extra-articular structures).
+- **Bold**: 72 elements. Clinical terms, table titles, and section labels correctly emphasized.
+- **Hierarchy**: Clean `#` > `##` > `###` heading structure.
+- **Weaknesses**: Slowest tool (775s). Leaves `<page_number>` tags in output. Some italic formatting glitches on quoted text.
+
+#### 2nd: marker-pdf
+
+Best speed-to-quality ratio. The pragmatic choice.
+
+- **Speed**: 33x faster than DocStrange, 23x faster than DeepSeek.
+- **Tables**: Markdown pipe tables that render correctly. Handles multi-line cells with `<br>`. 7 tables detected.
+- **Images**: 25 native embedded images extracted at original resolution.
+- **Lists**: 94 bullet items, the most of any tool. Proper indentation for nested sublists.
+- **Bold**: 80 elements, the most of any tool.
+- **Weaknesses**: Pipe tables can't handle very complex cell layouts as cleanly as HTML. Some `<sup>l</sup>` artifacts from converting the textbook's bullet markers.
+
+#### 3rd: DeepSeek-OCR
+
+Highest raw OCR text accuracy, but poor structure preservation.
+
+- **Text accuracy**: Best of all tools. Medical terminology, drug names, clinical measurements all correct. Uses LaTeX for math notation (`\(\leq 7\)`, `\(< 6\)` weeks).
+- **Tables**: Produces HTML `<table>` elements. Content is correct but flat structure (no `<thead>`/`<tbody>`).
+- **Images**: 24 images cropped from page rasters using model-predicted bounding box coordinates.
+- **Lists**: **Critical weakness.** Only 1 list item detected. Bullet lists get concatenated into single long lines (e.g., all risk factors for osteoporosis smashed into one paragraph). For a medical textbook that is ~40% bullet-pointed clinical criteria, this makes the output significantly harder to read.
+- **Bold**: No formatting preservation. Everything is plain text or headings.
+- **Headings**: Flat hierarchy. Uses `##` for almost everything including "OR" between clinical examples.
+
+### Tools Not Recommended
+
+- **Nougat**: Hallucinated on non-academic content (repeated "Clean-Clean-Clean..." on page 1 of Sample-PDF2). Trained on arXiv papers; struggles with clinical textbook formatting. No image extraction.
+- **PaddleOCR**: Plain text dump only. No tables, lists, bold, or image extraction. PP-StructureV3 (which adds structure) requires `paddlepaddle-gpu` from a Chinese package index that's unreachable from most cloud providers.
+
+### Recommendation
+
+| Use Case | Tool | Why |
+|----------|------|-----|
+| Medical education / MediFact | **DocStrange** | Best tables, image descriptions, lists, and bold formatting for study material |
+| Production pipeline (speed matters) | **marker-pdf** | 33x faster with 90% of the quality. Best speed/structure balance |
+| Maximum text accuracy | **DeepSeek-OCR** | Best raw OCR but unusable list/bold formatting for structured content |
 
 ## Output Structure
 
