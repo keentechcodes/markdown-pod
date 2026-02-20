@@ -36,7 +36,8 @@ uv.lock
 *.swo
 
 # Test/sample PDFs (large files)
-*.pdf
+# Uncomment to ignore large PDFs:
+# *.pdf
 
 # Output directories
 results*/
