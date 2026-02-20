@@ -191,6 +191,23 @@ Highest raw OCR text accuracy, but poor structure preservation.
 | Production pipeline (speed matters) | **marker-pdf** | 33x faster with 90% of the quality. Best speed/structure balance |
 | Maximum text accuracy | **DeepSeek-OCR** | Best raw OCR but unusable list/bold formatting for structured content |
 
+## Visualization
+
+Generate visual comparison charts from benchmark results:
+
+```bash
+uv run visualize_results.py results_BATES_1/
+```
+
+Outputs:
+- `timing_comparison.png` - Processing time bar chart
+- `content_extraction.png` - Characters/words extracted
+- `structure_detection.png` - Structural elements comparison
+- `radar_comparison.png` - Overall quality radar/spider chart
+- `speed_vs_quality.png` - Speed vs content scatter plot
+
+See `results_BATES_1/` for sample output from the Bates medical textbook benchmark.
+
 ## Output Structure
 
 Each converter produces:
@@ -222,6 +239,8 @@ markdown-pod/
   run_docstrange.py         # DocStrange converter
   run_docstrange_textbook.py # Enhanced textbook processor
   compare_results.py        # Results comparison generator
+  visualize_results.py      # Chart generation
+  results_BATES_1/          # Sample benchmark results
   RUNPOD_PLAN.md            # Cloud deployment guide
 ```
 
