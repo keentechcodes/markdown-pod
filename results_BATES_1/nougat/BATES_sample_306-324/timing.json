@@ -1,0 +1,11 @@
+{
+  "tool": "nougat",
+  "input": "BATES_sample_306-324.pdf",
+  "model": "0.1.0-base",
+  "model_load_time": 16.38,
+  "conversion_time": 207.23,
+  "total_time": 223.61,
+  "output_chars": 21194,
+  "output_words": 3082,
+  "pages": 19
+}

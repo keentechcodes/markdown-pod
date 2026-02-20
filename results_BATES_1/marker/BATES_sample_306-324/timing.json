@@ -1,0 +1,10 @@
+{
+  "tool": "marker-pdf",
+  "input": "BATES_sample_306-324.pdf",
+  "model_load_time": 2.23,
+  "conversion_time": 21.02,
+  "total_time": 23.24,
+  "output_chars": 31770,
+  "output_words": 4111,
+  "images_extracted": 25
+}

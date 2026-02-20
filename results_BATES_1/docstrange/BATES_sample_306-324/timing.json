@@ -1,0 +1,13 @@
+{
+  "tool": "docstrange",
+  "input": "BATES_sample_306-324.pdf",
+  "model": "nanonets/Nanonets-OCR-s (~4B VLM, Qwen2.5-VL-3B based)",
+  "mode": "GPU local",
+  "model_load_time": 14.46,
+  "conversion_time": 760.78,
+  "total_time": 775.24,
+  "output_chars": 53357,
+  "output_words": 8144,
+  "images_extracted": 33,
+  "images_matched": 21
+}

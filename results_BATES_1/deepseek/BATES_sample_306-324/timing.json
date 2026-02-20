@@ -1,0 +1,12 @@
+{
+  "tool": "deepseek-ocr",
+  "input": "BATES_sample_306-324.pdf",
+  "model": "deepseek-ai/DeepSeek-OCR",
+  "model_load_time": 14.83,
+  "conversion_time": 511.56,
+  "total_time": 526.39,
+  "output_chars": 29424,
+  "output_words": 4050,
+  "pages": 19,
+  "images_extracted": 24
+}

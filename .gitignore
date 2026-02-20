@@ -39,9 +39,9 @@ uv.lock
 # Uncomment to ignore large PDFs:
 # *.pdf
 
-# Output directories
-results*/
-test_results*/
+# Output directories (keep sample results)
+# results*/
+# test_results*/
 output/
 markdown_output/
 

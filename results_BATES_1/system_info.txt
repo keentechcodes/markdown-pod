@@ -1,0 +1,13 @@
+# Benchmark System Info
+Date: 2026-02-18T12:36:29+00:00
+PDF: /workspace/BATES_sample_306-324.pdf (2.1M)
+
+## GPU
+name, memory.total [MiB], driver_version
+NVIDIA RTX 4000 Ada Generation, 20475 MiB, 560.35.03
+
+## Python
+Python 3.11.14
+
+## uv
+uv 0.10.4

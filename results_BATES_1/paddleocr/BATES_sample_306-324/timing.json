@@ -1,0 +1,10 @@
+{
+  "tool": "paddleocr",
+  "variant": "PaddleOCR-basic",
+  "input": "BATES_sample_306-324.pdf",
+  "model_load_time": 4.82,
+  "conversion_time": 175.22,
+  "total_time": 180.04,
+  "output_chars": 28026,
+  "output_words": 3943
+}
