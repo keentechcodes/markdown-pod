@@ -199,14 +199,27 @@ Generate visual comparison charts from benchmark results:
 uv run visualize_results.py results_BATES_1/
 ```
 
-Outputs:
-- `timing_comparison.png` - Processing time bar chart
-- `content_extraction.png` - Characters/words extracted
-- `structure_detection.png` - Structural elements comparison
-- `radar_comparison.png` - Overall quality radar/spider chart
-- `speed_vs_quality.png` - Speed vs content scatter plot
+### Benchmark Charts
 
-See `results_BATES_1/` for sample output from the Bates medical textbook benchmark.
+#### Timing Comparison
+
+![Timing Comparison](results_BATES_1/timing_comparison.png)
+
+#### Content Extraction
+
+![Content Extraction](results_BATES_1/content_extraction.png)
+
+#### Structure Detection
+
+![Structure Detection](results_BATES_1/structure_detection.png)
+
+#### Speed vs Quality
+
+![Speed vs Quality](results_BATES_1/speed_vs_quality.png)
+
+#### Overall Comparison Radar
+
+![Radar Comparison](results_BATES_1/radar_comparison.png)
 
 ## Output Structure
 

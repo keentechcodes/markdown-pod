@@ -41,7 +41,7 @@ uv.lock
 
 # Output directories (keep sample results)
 # results*/
-# test_results*/
+test_results*/
 output/
 markdown_output/
 
